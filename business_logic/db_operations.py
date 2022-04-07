@@ -52,6 +52,7 @@ class DbOperations:
 	
 	def store_result(self, score, username):
 		user = self.user_exist_check()
+		print(user)
 		if user:
 			score = self.get_all_scores(username=username)
 			_ = json.loads(score)

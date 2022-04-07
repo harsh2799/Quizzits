@@ -59,6 +59,7 @@ class Main:
 				correct_counter += 1
 		
 		print("\n\n*******  End Of Test  *******\n\n")
+		print(correct_counter)
 		self.print_result(correct_counter)
 		if correct_counter < 3:
 			retake = input("Retake the test? (Y/N)")
