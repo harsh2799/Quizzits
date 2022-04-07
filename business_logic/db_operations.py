@@ -1,4 +1,6 @@
 import sqlite3 as sql
+import random
+import json
 
 
 class DbOperations:
@@ -43,6 +45,24 @@ class DbOperations:
 		cursor = self.conn.execute(f"select * from users")
 		print(cursor.fetchall())
 
+	def get_questions(self):
+		all_questions = self.conn.execute("select * from qa").fetchall()
+		q_to_ask = random.sample(range(20), 5)
+		return all_questions, q_to_ask
+	
+	def store_result(self, score, username):
+		user = self.user_exist_check()
+		if user:
+			score = self.get_all_scores(username=username)
+			_ = json.loads(score)
+			self.conn.execute(f"update test_data set all_tests = '{json.dumps(_.append(score))}' where username = '{username}'")
+			self.conn.commit()
+		else:
+			self.conn.execute(f"insert into test_data(`username`,`all_tests`) values('{username}', '{json.dumps([score])}')")
+			self.conn.commit()
+
+	def get_all_scores(self, username):
+		return self.conn.execute(f"Select all_tests from test_data where username = '{username}'").fetchone()
 
 
 
