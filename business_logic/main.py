@@ -15,25 +15,24 @@ class Main:
 	def login(self, username, password):
 		
 		user_list = DbOperations().user_exist_check(username=username)
-		print(f"user lsit: {user_list}")
 		if user_list:
 			is_valid = DbOperations().validate_user(username=username, password=password)
 			if is_valid:
-				return True, "User Logged In Successfully"
+				return True, "\n\n===========\n\nUser Logged In Successfully\n\n==========="
 			else:
-				return False, "Incorrect Username or Password"
+				return False, "\n\n===========\n\nIncorrect Username or Password\n\n==========="
 
 		else:
-			return False, "User Doesn't Exist"
+			return False, "\n\n===========\n\nUser Doesn't Exist\n\n==========="
 
 
 	def sign_up(self, username, password):
 		user_list = DbOperations().user_exist_check(username=username)
 		if user_list:
-			return False, "User Already Exist"
+			return False, "\n\n===========\n\nUser Already Exist\n\n==========="
 		
 		DbOperations().create_user(username=username, password=password)
-		return True, "User Created"
+		return True, "\n\n===========\n\nUser Created\n\n==========="
 
 	def print_question(self, question):
 		options = eval(question[2])
@@ -55,7 +54,9 @@ class Main:
 		for i in indexes:
 			self.print_question(questions[i])
 			choice = input("\nEnter Your Choice: ")
-			if(questions[i][2][options[choice.upper()]] == questions[i][3]):
+			print("Selected Choice: ",eval(questions[i][2])[options[choice.upper()]])
+			print("Answer: ", questions[i][3])
+			if(eval(questions[i][2])[options[choice.upper()]] == questions[i][3]):
 				correct_counter += 1
 		
 		print("\n\n*******  End Of Test  *******\n\n")
@@ -138,18 +139,17 @@ try:
 		elif option == 2:
 			results = DbOperations().get_all_scores(x.get_username())
 			scores = json.loads(results) if results else print("No Exams Taken Yet")
+			print("\n=====  TEST HISTORY  =====\n")
 			if scores:
 				for _ in scores:
-					print(f"{_}/5", end=", ")
+					print(f"Test {scores.index(_)+1}: {_}/5")
+			print("\n")
 		elif option == 3:
 			results = DbOperations().get_all_scores(x.get_username())
 			scores = json.loads(results) if results else print("No Exams Taken Yet")
 			if scores:
-				print(f"""
-					Maximum Score: {max(scores)}/5
-					Minimum Score: {min(scores)}/5
-					Average Score: {sum(scores)/len(scores)}/5
-				""")
+				print("\n=====  TEST STATS  =====\n")
+				print(f"""Maximum Score: {max(scores)}/5\nMinimum Score: {min(scores)}/5\nAverage Score: {sum(scores)/len(scores)}/5\n""")
 
 		e = input("Want to Exit? (Y/N) : ")
 		if e == 'y' or e == 'Y':

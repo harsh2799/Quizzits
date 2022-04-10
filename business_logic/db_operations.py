@@ -18,6 +18,11 @@ class DbOperations:
 		users = cursor.fetchall()
 		return users
 
+	def check_test_data_exists(self, username=''):
+		cursor = self.conn.execute(f"select * from test_data where username = '{username}'")
+		user = cursor.fetchone()
+		return user
+
 	def create_table_user(self):
 		# conn = self.get_connection()
 		self.conn.execute("CREATE TABLE USERS (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
@@ -33,7 +38,6 @@ class DbOperations:
 
 		cursor = self.conn.execute(f"select * from USERS as U where U.username='{username}' and U.password='{password}'")
 		user = cursor.fetchall()
-		print(user)
 		return user
 
 	def create_user(self, username="", password=""):
@@ -51,19 +55,20 @@ class DbOperations:
 		return all_questions, q_to_ask
 	
 	def store_result(self, score, username):
-		user = self.user_exist_check()
-		print(user)
+		user = self.check_test_data_exists(username=username)
 		if user:
-			score = self.get_all_scores(username=username)
-			_ = json.loads(score)
-			self.conn.execute(f"update test_data set all_tests = '{json.dumps(_.append(score))}' where username = '{username}'")
+			past_scores = self.get_all_scores(username=username)
+			_ = json.loads(past_scores)
+			_.append(score)
+			self.conn.execute(f"update test_data set all_tests = '{json.dumps(_)}' where username = '{username}'")
 			self.conn.commit()
 		else:
 			self.conn.execute(f"insert into test_data(`username`,`all_tests`) values('{username}', '{json.dumps([score])}')")
 			self.conn.commit()
 
 	def get_all_scores(self, username):
-		return self.conn.execute(f"Select all_tests from test_data where username = '{username}'").fetchone()
+		scores = self.conn.execute(f"Select all_tests from test_data where username = '{username}'").fetchone()
+		return scores[0] if scores else []
 
 
 
